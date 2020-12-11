@@ -13,7 +13,7 @@ library(tidyverse)
 library(corrplot)
 library(cowplot)
 library(MASS)
-data <- read.csv("/home/ndoye/M1_SSD/Projet_R/data/african_crises(1).csv")
+data <- read.csv("/home/ndoye/M1_SSD/Projet_R/Shiny_projet_R/data/african_crises(1).csv")
 data <- cleandata(data)
 
 # Define UI for application that draws a histogram
