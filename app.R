@@ -1,4 +1,4 @@
-#
+  #
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
 #
@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-
+  
 library(shiny)
 library(CrisisAfrica)
 library(tidyverse)
@@ -20,16 +20,16 @@ data <- cleandata(data)
 ui <- fluidPage(
   
     # Application title
-    titlePanel("Resumé de notre projet"),
+    titlePanel("Statistique descriptive"),
     selectInput("sI",label = "function",choices = ls("package:CrisisAfrica")),
     selectInput("sIV",label = "type de plot",choices = c("Visualisation1","Visualisation2",
                                                          "Visualisation3","Visualisation4"
                                                          ,"Visualisation5","Visualisation6","Visualisation7")),
-    
     verbatimTextOutput("summary"),
     tableOutput("table"),
     plotOutput("descriptive"),
     verbatimTextOutput("sortie")
+ 
     
 )
 
@@ -38,6 +38,11 @@ server <- function(input, output,session) {
         if(input$sI =="cleandata"){
             summary(cleandata(data))
         }
+       else if(input$sI=="loaddata"){
+         if (exists("data")){
+           print("les données data ont été chargé avec succes")
+         }
+       }
     })
     output$table <- renderTable({
         if(input$sI=="readdata"){
@@ -80,6 +85,9 @@ server <- function(input, output,session) {
     output$sortie <- renderPrint({
       if(input$sI=="crisislm"){
         crisislm(data)
+      }
+      else if(input$sI=="correlation"){
+        correlation(data)
       }
     })
     
