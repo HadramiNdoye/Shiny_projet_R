@@ -38,21 +38,6 @@ ui <- navbarPage("Resume du projet",
                  )
                  
 )
-# ui <- fluidPage(
-#   
-#     # Application title
-#     titlePanel("Statistique descriptive"),
-#     selectInput("sI",label = "function",choices = ls("package:CrisisAfrica")),
-#     selectInput("sIV",label = "type de plot",choices = c("Visualisation1","Visualisation2",
-#                                                          "Visualisation3","Visualisation4"
-#                                                          ,"Visualisation5","Visualisation6","Visualisation7")),
-#     verbatimTextOutput("summary"),
-#     tableOutput("table"),
-#     plotOutput("descriptive"),
-#     verbatimTextOutput("sortie")
-#  
-#     
-# )
 
 server <- function(input, output,session) {
     output$summary <- renderPrint({
@@ -97,7 +82,7 @@ server <- function(input, output,session) {
                   }
              }
         else if(input$sI == "RegressionLineaire"){
-            RegressionLineaire(data)
+          RegressionLineaire(data)
         }
         else if(input$sI == "Correlation"){
             Correlation(data)
