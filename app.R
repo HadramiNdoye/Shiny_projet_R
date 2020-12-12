@@ -8,6 +8,8 @@
 #
   
 library(shiny)
+library(shinyjs)
+library(shinythemes)
 library(CrisisAfrica)
 library(tidyverse)
 library(corrplot)
@@ -17,7 +19,8 @@ data <- read.csv("data/african_crises.csv")
 data <- CleanData(data)
 
 # Define UI for resume our project
-ui <- navbarPage("Resume du projet",
+ui <- navbarPage(theme= shinytheme("readable"),
+                 title = img(src="ugalogo.jpg", height = "40px",align="center"), id = "navBar",
                  tabPanel("Statistique descriptive",
                           selectInput("sI",label = "Les fonctions",choices = ls("package:CrisisAfrica")),
                               selectInput("sIV",label = "type de visualisation",choices = c("Visualisation1","Visualisation2",
@@ -35,6 +38,18 @@ ui <- navbarPage("Resume du projet",
                             
                   ),
                  tabPanel("Presentation du groupe",
+                          includeHTML("about.html"),
+                          shinyjs::useShinyjs(),
+                          tags$head(
+                            tags$link(rel = "stylesheet", 
+                                      type = "text/css", 
+                                      href = "plugins/carousel.css"),
+                            tags$script(src = "plugins/holder.js")
+                          ),
+                          tags$style(type="text/css",
+                                     ".shiny-output-error { visibility: hidden; }",
+                                     ".shiny-output-error:before { visibility: hidden; }")
+                          
                  )
                  
 )
