@@ -14,39 +14,60 @@ library(corrplot)
 library(cowplot)
 library(MASS)
 data <- read.csv("data/african_crises.csv")
-data <- cleandata(data)
+data <- CleanData(data)
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(
-  
-    # Application title
-    titlePanel("Statistique descriptive"),
-    selectInput("sI",label = "function",choices = ls("package:CrisisAfrica")),
-    selectInput("sIV",label = "type de plot",choices = c("Visualisation1","Visualisation2",
-                                                         "Visualisation3","Visualisation4"
-                                                         ,"Visualisation5","Visualisation6","Visualisation7")),
-    verbatimTextOutput("summary"),
-    tableOutput("table"),
-    plotOutput("descriptive"),
-    verbatimTextOutput("sortie")
- 
-    
+# Define UI for resume our project
+ui <- navbarPage("Resume du projet",
+                 tabPanel("Statistique descriptive",
+                          selectInput("sI",label = "Les fonctions",choices = ls("package:CrisisAfrica")),
+                              selectInput("sIV",label = "type de visualisation",choices = c("Visualisation1","Visualisation2",
+                                                                                   "Visualisation3","Visualisation4"
+                                                                                   ,"Visualisation5"
+                                                                                   ,"Visualisation6","Visualisation7")),
+                      
+                              verbatimTextOutput("summary"),
+                              tableOutput("table"),
+                              plotOutput("descriptive"),
+                              verbatimTextOutput("sortie")
+                 ), 
+                 tabPanel("Analyse et interpretation",
+                          includeMarkdown("projetb.Rmd")  
+                            
+                  ),
+                 tabPanel("Presentation du groupe",
+                 )
+                 
 )
+# ui <- fluidPage(
+#   
+#     # Application title
+#     titlePanel("Statistique descriptive"),
+#     selectInput("sI",label = "function",choices = ls("package:CrisisAfrica")),
+#     selectInput("sIV",label = "type de plot",choices = c("Visualisation1","Visualisation2",
+#                                                          "Visualisation3","Visualisation4"
+#                                                          ,"Visualisation5","Visualisation6","Visualisation7")),
+#     verbatimTextOutput("summary"),
+#     tableOutput("table"),
+#     plotOutput("descriptive"),
+#     verbatimTextOutput("sortie")
+#  
+#     
+# )
 
 server <- function(input, output,session) {
     output$summary <- renderPrint({
-        if(input$sI =="cleandata"){
-            summary(cleandata(data))
+        if(input$sI =="CleanData"){
+            summary(CleanData(data))
         }
-       else if(input$sI=="loaddata"){
+       else if(input$sI=="LoadData"){
          if (exists("data")){
            print("les données data ont été chargé avec succes")
          }
        }
     })
     output$table <- renderTable({
-        if(input$sI=="readdata"){
-            readdata(data)
+        if(input$sI=="ReadData"){
+            ReadData(data)
         }
     })
     
@@ -75,22 +96,23 @@ server <- function(input, output,session) {
                     v[7]
                   }
              }
-        else if(input$sI == "crisislm"){
-            crisislm(data)
+        else if(input$sI == "RegressionLineaire"){
+            RegressionLineaire(data)
         }
-        else if(input$sI == "correlation"){
-            correlation(data)
+        else if(input$sI == "Correlation"){
+            Correlation(data)
         }
     })
     output$sortie <- renderPrint({
-      if(input$sI=="crisislm"){
-        crisislm(data)
+      if(input$sI=="RegressionLineaire"){
+        RegressionLineaire(data)
       }
-      else if(input$sI=="correlation"){
-        correlation(data)
+      else if(input$sI=="Correlation"){
+        Correlation(data)
       }
     })
     
 }
 # Run the application 
 shinyApp(ui = ui, server = server)
+

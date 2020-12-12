@@ -1,0 +1,131 @@
+---
+title: "projet R"
+author: "Heddia Bilel"
+date: "11/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r,echo=FALSE,include=FALSE}
+library(tidyverse)
+library(cowplot)
+library(ggplot2)
+library(tidyverse)
+library(questionr)
+library(dplyr)
+library(labelled)
+
+```
+
+```{r}
+
+d1<-read.csv(file="/home/ndoye/african_crises.csv",header = TRUE)
+head(d1)
+d1
+summary(d1)#le max de cuurency crise est 1 et pas 2
+str(d1)
+d1
+glimpse(d1)
+look_for(d1)#permet de lister les différentes variables d’un fichier de données, ainsi que leurs principales caractéristiques
+
+```
+```{r}
+tab <-table(d1$country) #on remarque que le nombre d'observation est diff pour chaque pays entre 58 et 155
+tab
+barplot(tab)
+```
+
+## Recodage d'une variable: on va calculer la décennie de chaque observation, en divisant l’année de mesure par 10, et en multipliant la partie entière de ce résultat par 10. Cette manipulation très simple donne 1940 pour les mesures des années 1940 à 1949, 1950 pour les années 1950-1959, et ainsi de suite.
+
+```{r}
+d1$Decade <- factor(10 * d1$year %/% 10)
+d1
+```
+```{r}
+with(d1, qplot(year, gdp_weighted_default ))
+
+```
+on remarque La dette totale en défaut vis-à-vis du PIB est bcp plus entre les années 1950 et 2000
+
+```{r}
+with(d1, qplot(year, inflation_annual_cpi  ))
+```
+
+```{r}
+with(d1, qplot(year, exch_usd   )) # Le taux de change du pays vis-à-vis de l'USD augmente à partire des anné 40
+```
+
+Cherchons désormais à mieux comprendre les variations du taux  de change du pays vis-à-vis de l'USD au fil des années.
+
+On va ici utiliser le principe de la visualisation par petits multiples, c’est-à-dire que l’on va reproduire le même graphique pour chacun des pays, et visualiser l’ensemble de ces graphiques dans une même fenêtre. Concrètement, il va donc s’agir de montrer taux  de change du pays vis-à-vis de l'USD anulle en faisant apparaître chaque pays dans une facette différente du graphique.
+
+```{r}
+qplot(year, exch_usd , data = d1) +
+  facet_wrap(~ country)
+```
+
+```{r}
+qplot(data = d1,x=year, y=exch_usd,geom = "line") +
+  facet_wrap(~ country)
+```
+
+
+ 
+```{r}
+p <- ggplot(data = d1, aes(y =exch_usd  , x = inflation_annual_cpi  ))
+p + geom_point() +
+  facet_grid(. ~ Decade) +
+  scale_x_continuous(breaks = seq(-29, 21989695 , by =150000000 ))
+```
+ 
+ 
+```{r}
+plot(d1$gdp_weighted_default , d1$exch_usd)
+plot(d1$exch_usd , d1$inflation_annual_cpi )
+```
+
+ 
+Analyse (variable qualitatives):
+```{r}
+S<-table(d1$systemic_crisis, useNA = "ifany")
+barplot(S)
+hist(d1$systemic_crisis)
+
+table(d1$domestic_debt_in_default, useNA = "ifany")
+hist(d1$domestic_debt_in_default)
+
+table(d1$sovereign_external_debt_default, useNA = "ifany")
+hist(d1$sovereign_external_debt_default)
+
+table(d1$independence, useNA = "ifany")
+hist(d1$independence)
+
+table(d1$currency_crises, useNA = "ifany")
+hist(d1$currency_crises)
+
+table(d1$inflation_crises, useNA = "ifany")
+hist(d1$inflation_crises)
+
+#table(d1$banking_crisis, useNA = "ifany")
+#hist(as.numeric(d1$banking_crisis))
+```
+ stat bivarié
+```{r}
+d1.bankcris <- subset(d1,banking_crisis  == "crisis")
+d1.banknocris <- subset(d1,banking_crisis  == "no_crisis")
+boxplot(d1.bankcris$exch_usd    ,d1.banknocris$exch_usd   )
+
+###
+tab2<-table(d1$country,d1$banking_crisis)
+tab2
+barplot(tab2)
+
+z <- ggplot(data = d1) +
+  geom_bar(mapping = aes(x = country , fill=country ),position=position_dodge())
+
+z
+
+```
+ 
