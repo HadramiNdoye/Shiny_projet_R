@@ -78,11 +78,6 @@ server <- function(input, output,session) {
           r <- ReadData(data)
           r[2]
         }
-        else if(input$sI=="LoadData"){
-           if (exists("data")){
-             print("les données data ont été chargé avec succes")
-           }
-         }
     })
     output$descriptive <- renderPlot({
             if(input$sI == "Visualisation"){
