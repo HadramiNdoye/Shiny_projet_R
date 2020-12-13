@@ -15,6 +15,8 @@ library(tidyverse)
 library(corrplot)
 library(cowplot)
 library(MASS)
+library(knitr)
+
 data <- read.csv("data/african_crises.csv")
 # datac: les données nettoyées
 datac <- CleanData(data)
@@ -38,7 +40,10 @@ ui <- navbarPage(theme= shinytheme("readable"),
                               verbatimTextOutput("sortie") 
                  ), 
                  tabPanel("Analyse et interpretation",
-                          includeMarkdown("projetb.Rmd")  
+                          # Conversion d'un fichier Rmarkdown en markdown
+                          rmdfiles <- c("projetb.Rmd"),
+                          sapply(rmdfiles, knit, quiet = T),
+                          withMathJax(includeMarkdown("projetb.md"))
                             
                   ),
                  tabPanel("Presentation du groupe",
@@ -57,7 +62,7 @@ ui <- navbarPage(theme= shinytheme("readable"),
                  )
                  
 )
-
+# partie server
 server <- function(input, output,session) {
   output$table <- renderTable({
     if(input$sI=="ReadData"){
