@@ -23,15 +23,18 @@ ui <- navbarPage(theme= shinytheme("readable"),
                  title = img(src="ugalogo.jpg", height = "40px",align="center"), id = "navBar",
                  tabPanel("Statistique descriptive",
                           selectInput("sI",label = "Les fonctions",choices = ls("package:CrisisAfrica")),
-                              selectInput("sIV",label = "type de visualisation",choices = c("Visualisation1","Visualisation2",
-                                                                                   "Visualisation3","Visualisation4"
-                                                                                   ,"Visualisation5"
-                                                                                   ,"Visualisation6","Visualisation7")),
+                          conditionalPanel(
+                            condition = "input.sI == 'Visualisation'",
+                            selectInput("sIV",label = "type de visualisation",choices = c("Visualisation1","Visualisation2",
+                                                                                          "Visualisation3","Visualisation4"
+                                                                                          ,"Visualisation5"
+                                                                                          ,"Visualisation6","Visualisation7"))
+                          ),
                       
                               verbatimTextOutput("summary"),
                               tableOutput("table"),
                               plotOutput("descriptive"),
-                              verbatimTextOutput("sortie")
+                              verbatimTextOutput("sortie") 
                  ), 
                  tabPanel("Analyse et interpretation",
                           includeMarkdown("projetb.Rmd")  
