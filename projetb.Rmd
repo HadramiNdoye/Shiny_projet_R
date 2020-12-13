@@ -5,12 +5,12 @@ date: "`r format(Sys.time(), '%d, %B, %Y')`"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(echo = TRUE,message = FALSE, warning = FALSE)
 ```
 
 
-```{r,echo=FALSE,include=FALSE}
+```{r,echo=FALSE,include=FALSE, echo=FALSE}
 library(tidyverse)
 library(corrplot)
 library(cowplot)
@@ -234,7 +234,7 @@ stepAIC(lm(systemic_crisis~1, d2),systemic_crisis~exch_usd+
 
 ## IX. Conclusion
 
-Au terme de cette étude on peut dire que les facteurs (variable) qui sont liés ou qui contribuent le plus à la crise systémique ("systemic_crisis") en Afrique notamment dans le cas des 13 pays sont : 
+Au terme de cette étude on peut dire que les facteurs (variables) qui sont liés ou qui contribuent le plus à la crise systémique ("systemic_crisis") en Afrique notamment dans le cas des 13 pays sont : 
 
 - Crise bancaire ("banking_crisis")
 - Défaillance de la dette intérieure souveraine ("domestic_debt_in_default")
