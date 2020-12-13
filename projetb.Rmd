@@ -136,7 +136,9 @@ g3 + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 
 ### 4. Représentation de la dette totale en défaut vis-à-vis du PIB au cours des années
 ```{r, echo=FALSE}
-with(d1, qplot(year, gdp_weighted_default))
+with(d1, qplot(year, gdp_weighted_default)) +
+  ggtitle("La dette totale en défaut vis-à-vis du PIB en fonction des années") + 
+  theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
 On remarque que la quasi-totalité des pays ont commencés a s'endetter à partir des années 1960 (année indépendance massive de plusieurs pays africains)
@@ -144,22 +146,28 @@ On remarque que la quasi-totalité des pays ont commencés a s'endetter à parti
 
 ### 5. Représentation du taux d'inflation annuel de l'IPC au fil des années
 ```{r, echo=FALSE}
-with(d1, qplot(year, inflation_annual_cpi))
+with(d1, qplot(year, inflation_annual_cpi))+
+  ggtitle("Le taux d'inflation annuel de l'IPC en fonction des années") + 
+  theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
 Les différents pays n'ont pratiquement pas connus d'inflation annuel de l'IPC.
 
 
-### Représentation du taux de change du pays vis-à-vis de l'USD
+### Représentation du taux de change des pays vis-à-vis de l'USD au cours des années
 ```{r, echo=FALSE}
-w3 <- with(d1, qplot(year, exch_usd))
+with(d1, qplot(year, exch_usd))+
+  ggtitle("Le taux de change des pays vis-à-vis de l'USD en fonction des années") + 
+  theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
 
-### 6. Représentation de l'évolution du taux de change du pays vis-à-vis de l'USD en fonction de chaque pays
+### 6. Représentation de l'évolution du taux de change des pays vis-à-vis de l'USD en fonction de chaque pays
 ```{r, echo=FALSE}
 qplot(data = d1,x=year, y=exch_usd,geom = "line") +
-  facet_wrap(~ country)
+  facet_wrap(~ country)+
+  ggtitle("Évolution du taux de change des pays vis-à-vis de l'USD en fonction de chaque pays") + 
+  theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
 
