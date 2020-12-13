@@ -1,131 +1,246 @@
 ---
-title: "projet R"
-author: "Heddia Bilel"
-date: "11/11/2020"
+title: "PROJET R"
+author: "HEDDIA Bilel, N'DOYE El Hadrami, RAMDÉ Ismaïl, MEHDAOUI Nabil"
+date: "`r format(Sys.time(), '%d, %B, %Y')`"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,message = FALSE, warning = FALSE)
 ```
+
+
 ```{r,echo=FALSE,include=FALSE}
 library(tidyverse)
+library(corrplot)
 library(cowplot)
 library(ggplot2)
 library(tidyverse)
 library(questionr)
 library(dplyr)
 library(labelled)
-
+library(MASS)
+library(CrisisAfrica)
 ```
 
-```{r}
+# RAPPORT DE L'ÉTUDE
 
-d1<-read.csv(file="/home/ndoye/african_crises.csv",header = TRUE)
+Données sur la crise économique, bancaire et systémique en Afrique dans 13 pays africains (1860 à 2014) 
+
+**Le contexte** 
+Cet ensemble de données est un dérivé de Reinhart et. al's Global Financial Stability dataset, disponible en ligne à l'adresse https://www.hbs.edu/behavioral-finance-and-financial-stability/data/Pages/global.aspx 
+ 
+**Contenu** 
+L'ensemble de données se concentre spécifiquement sur les crises bancaires, d'endettement, financières, d'inflation et systémiques qui se sont produites, de 1860 à 2014, dans 13 pays africains, dont: Algérie, Angola, République centrafricaine, Côte d'Ivoire, Égypte, Kenya, Maurice, Maroc, Nigéria, Afrique du Sud, Tunisie, Zambie et Zimbabwe. 
+
+**Question :** 
+Quels sont les facteurs les plus associés aux crises systémiques en Afrique?
+
+>
+**Variables**
+>
+**case :** Un nombre qui désigne un pays spécifique
+>
+**cc3 :** Un code de pays à trois lettres 
+>
+**contry :** Le nom du pays 
+>
+**year :** L'année de l'observation
+>
+**systemic_crisis :** «0» signifie qu'aucune crise systémique n'est survenue dans l'année et «1» signifie qu'une crise systémique s'est produite dans l'année.
+>
+**exch_usd :** Le taux de change du pays vis-à-vis de l'USD
+Dollar américain (USD)
+>
+**domestic_debt_in_default :** "0" signifie qu'aucune défaillance de la dette intérieure souveraine n'est survenue au cours de l'année et "1" signifie qu'une défaillance de la dette intérieure souveraine s'est produite au cours de l'année 
+>
+**sovereign_external_debt_default :** "0" signifie qu'aucune défaillance de la dette extérieure souveraine n'est survenue au cours de l'année et "1" signifie qu'une défaillance de la dette extérieure souveraine s'est produite au cours de l'année 
+>
+**gdp_weighted_default :** La dette totale en défaut vis-à-vis du PIB 
+>
+**inflation_annual_cpi :** Le taux d'inflation annuel de l'IPC
+>
+**independence :** "0" signifie "pas d'indépendance" et "1" signifie "indépendance" 
+>
+**currency_crises :** "0" signifie qu'aucune crise de change n'est survenue au cours de l'année et "1" signifie qu'une crise de change s'est produite au cours de l'année 
+>
+**inflation_crises :** "0" signifie qu'aucune crise d'inflation n'est survenue au cours de l'année et "1" signifie qu'une crise d'inflation s'est produite au cours de l'année 
+>
+**banking_crisis :** "no_crisis" signifie qu'aucune crise bancaire n'est survenue au cours de l'année et "crise" signifie qu'une crise bancaire s'est produite au cours de l'année 
+
+
+## I. Chargement de la data frame African_crises.csv
+**On commence par charger notre jeu de données African_crises.csv**
+
+```{r, echo=FALSE}
+d1<- read.csv("data/african_crises.csv")
+```
+
+## II. Lecture des données
+**Affichage de quelques lignes de la data framme**
+```{r, echo=FALSE}
 head(d1)
-d1
-summary(d1)#le max de cuurency crise est 1 et pas 2
-str(d1)
-d1
-glimpse(d1)
-look_for(d1)#permet de lister les différentes variables d’un fichier de données, ainsi que leurs principales caractéristiques
-
 ```
-```{r}
-tab <-table(d1$country) #on remarque que le nombre d'observation est diff pour chaque pays entre 58 et 155
-tab
-barplot(tab)
+**Résumé des données**
+```{r, echo=FALSE}
+summary(d1)
 ```
+Ces actions nous permettent de détecter des anomalies.
 
-## Recodage d'une variable: on va calculer la décennie de chaque observation, en divisant l’année de mesure par 10, et en multipliant la partie entière de ce résultat par 10. Cette manipulation très simple donne 1940 pour les mesures des années 1940 à 1949, 1950 pour les années 1950-1959, et ainsi de suite.
 
-```{r}
-d1$Decade <- factor(10 * d1$year %/% 10)
-d1
-```
-```{r}
-with(d1, qplot(year, gdp_weighted_default ))
 
-```
-on remarque La dette totale en défaut vis-à-vis du PIB est bcp plus entre les années 1950 et 2000
-
-```{r}
-with(d1, qplot(year, inflation_annual_cpi  ))
+## III. Nettoyage des données
+Nous avons transformés la variable crise systémique en une variable quantitative et avons procédés a un recodage de la variable en "0 et 1".
+```{r, echo=FALSE}
+d2 <- CleanData(d1)
 ```
 
-```{r}
-with(d1, qplot(year, exch_usd   )) # Le taux de change du pays vis-à-vis de l'USD augmente à partire des anné 40
+
+
+## IV. Visualisation
+
+### 1. Représentation de tous les pays en fonction de la quantité de données
+```{r, echo=FALSE}
+tab1 <- table(d1$country)
+dftab1 <- data.frame(tab1)
+Pays <- dftab1$Var1
+g1 <- ggplot(data = dftab1) +
+  geom_bar(stat="identity",mapping = aes(x = Var1,y=Freq,fill=Pays)) +
+  ggtitle("Diagramme en bâton représentant les pays") + xlab("Pays")
+g1 + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
-Cherchons désormais à mieux comprendre les variations du taux  de change du pays vis-à-vis de l'USD au fil des années.
+Ce graphique nous montre le nombre d'observation par pays. On remarque l’Égypte est le pays qui a le plus grands nombre d'observation tan-disque la République de Centre Afrique a le plus petit nombre d'observation.
 
-On va ici utiliser le principe de la visualisation par petits multiples, c’est-à-dire que l’on va reproduire le même graphique pour chacun des pays, et visualiser l’ensemble de ces graphiques dans une même fenêtre. Concrètement, il va donc s’agir de montrer taux  de change du pays vis-à-vis de l'USD anulle en faisant apparaître chaque pays dans une facette différente du graphique.
 
-```{r}
-qplot(year, exch_usd , data = d1) +
-  facet_wrap(~ country)
+### 2. Représentation de la variable crise systémique
+```{r, echo=FALSE}
+tabcs <- table(d1$systemic_crisis)
+dftabcs <- data.frame(tabcs)
+crisis_syst<- dftabcs$Var1
+g2 <- ggplot(data = dftabcs) +
+  geom_bar(stat="identity",mapping = aes(x = Var1,y = Freq,fill = crisis_syst)) +
+  ggtitle("Diagramme en bâton représentant la crise systemique") + xlab("crise systemique")
+g2 + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
 ```
 
-```{r}
+De façon générale on observe une plus grande fréquence pour la modalité "pas de crise systémique" par rapport à la modalité "crise systémique".
+
+
+### 3. Représentation de la variable crise systémique en fonction de chaque pays
+```{r, echo=FALSE}
+tab2<-table(d1$country,d1$banking_crisis)
+dftab2 <- data.frame(tab2)
+crise_systemique <- dftab2$Var2
+g3 <- ggplot(data = dftab2) +
+  geom_bar(stat="identity",mapping = aes(x = Var1,y=Freq,fill=crise_systemique)) +
+  ggtitle("Crise systemique en fonction des pays") + xlab("Pays")
+g3 + theme (plot.title = element_text(size=11,face="bold",hjust = 0.5))
+```
+
+
+### 4. Représentation de la dette totale en défaut vis-à-vis du PIB au cours des années
+```{r, echo=FALSE}
+with(d1, qplot(year, gdp_weighted_default))
+```
+
+On remarque que la quasi-totalité des pays ont commencés a s'endetter à partir des années 1960 (année indépendance massive de plusieurs pays africains)
+
+
+### 5. Représentation du taux d'inflation annuel de l'IPC au fil des années
+```{r, echo=FALSE}
+with(d1, qplot(year, inflation_annual_cpi))
+```
+
+Les différents pays n'ont pratiquement pas connus d'inflation annuel de l'IPC.
+
+
+### Représentation du taux de change du pays vis-à-vis de l'USD
+```{r, echo=FALSE}
+w3 <- with(d1, qplot(year, exch_usd))
+```
+
+
+### 6. Représentation de l'évolution du taux de change du pays vis-à-vis de l'USD en fonction de chaque pays
+```{r, echo=FALSE}
 qplot(data = d1,x=year, y=exch_usd,geom = "line") +
   facet_wrap(~ country)
 ```
 
 
- 
-```{r}
-p <- ggplot(data = d1, aes(y =exch_usd  , x = inflation_annual_cpi  ))
-p + geom_point() +
-  facet_grid(. ~ Decade) +
-  scale_x_continuous(breaks = seq(-29, 21989695 , by =150000000 ))
-```
- 
- 
-```{r}
-plot(d1$gdp_weighted_default , d1$exch_usd)
-plot(d1$exch_usd , d1$inflation_annual_cpi )
+
+## V. Mise en corrélation des différentes variables d'intérêts
+```{r, echo=FALSE}
+dtfc <- d2[4:14]
+corr <- cor(dtfc,method="pearson")
+corrplot(corr, type="upper", order="hclust", tl.col="black", tl.srt=45,
+                title="Matrice de corrélation (corrélogramme)", mar=c(0,0,5,0),
+                tl.offset = 1)
 ```
 
- 
-Analyse (variable qualitatives):
-```{r}
-S<-table(d1$systemic_crisis, useNA = "ifany")
-barplot(S)
-hist(d1$systemic_crisis)
 
-table(d1$domestic_debt_in_default, useNA = "ifany")
-hist(d1$domestic_debt_in_default)
 
-table(d1$sovereign_external_debt_default, useNA = "ifany")
-hist(d1$sovereign_external_debt_default)
-
-table(d1$independence, useNA = "ifany")
-hist(d1$independence)
-
-table(d1$currency_crises, useNA = "ifany")
-hist(d1$currency_crises)
-
-table(d1$inflation_crises, useNA = "ifany")
-hist(d1$inflation_crises)
-
-#table(d1$banking_crisis, useNA = "ifany")
-#hist(as.numeric(d1$banking_crisis))
+## VI. Représentation de la matrice de scatter plot
+```{r, echo=FALSE}
+systemic_crisis <- d2$systemic_crisis
+exch_usd <- d2$exch_usd
+domestic_debt_in_default <- d2$domestic_debt_in_default
+sovereign_external_debt_default <- d2$sovereign_external_debt_default
+gdp_weighted_default <- d2$gdp_weighted_default
+inflation_annual_cpi <- d2$inflation_annual_cpi
+independence <- d2$independence
+currency_crises <- d2$currency_crises
+inflation_crises <- d2$inflation_crises
+banking_crisis <- d2$banking_crisis
+  
+  
+# matrice de scatter plot
+scartter <- graphics::pairs(data.frame(systemic_crisis, exch_usd, domestic_debt_in_default,
+                                        sovereign_external_debt_default, gdp_weighted_default,
+                                        inflation_annual_cpi, independence,
+                                        currency_crises, inflation_crises,
+                                        banking_crisis), pch = 1, lower.panel=panel.smooth,
+                            col = "blue", main = "Matrice de Scatter plot")
 ```
- stat bivarié
-```{r}
-d1.bankcris <- subset(d1,banking_crisis  == "crisis")
-d1.banknocris <- subset(d1,banking_crisis  == "no_crisis")
-boxplot(d1.bankcris$exch_usd    ,d1.banknocris$exch_usd   )
 
-###
-tab2<-table(d1$country,d1$banking_crisis)
-tab2
-barplot(tab2)
 
-z <- ggplot(data = d1) +
-  geom_bar(mapping = aes(x = country , fill=country ),position=position_dodge())
 
-z
-
+## VII. La régression Linéaire 
+```{r, echo=FALSE}
+# Regression lineaire
+ml <- lm(systemic_crisis~exch_usd+domestic_debt_in_default+sovereign_external_debt_default
+                  +gdp_weighted_default+inflation_annual_cpi+independence+
+                    currency_crises+inflation_crises+banking_crisis, d2)
+ml
+# test sur les paramètres
+resum <- summary(ml)
+resum
+# analyse des variances
+anov <- anova(ml)
+anov
 ```
- 
+
+
+
+## VIII. Séléction des variables contribuant au plus à la crise systémique
+```{r, echo=FALSE}
+# Sélection des variables : pas à pas de façon automatique :
+stepAIC(lm(systemic_crisis~1, d2),systemic_crisis~exch_usd+
+          domestic_debt_in_default+sovereign_external_debt_default+
+          gdp_weighted_default+inflation_annual_cpi+independence+
+          currency_crises+inflation_crises+banking_crisis, direction="both")
+```
+
+
+## IX. Conclusion
+
+Au terme de cette étude on peut dire que les facteurs (variable) qui sont liés ou qui contribuent le plus à la crise systémique ("systemic_crisis") en Afrique notamment dans le cas des 13 pays sont : 
+
+- Crise bancaire ("banking_crisis")
+- Défaillance de la dette intérieure souveraine ("domestic_debt_in_default")
+- Défaillance de la dette extérieure souveraine ("sovereign_external_debt_default")
+- Dette totale en défaut vis-à-vis du PIB  ("gdp_weighted_default")
+- Taux d'inflation annuel de l'IPC ("inflation_annual_cpi")
+- Crise de change ("currency_crises")
+
+
