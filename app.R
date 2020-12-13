@@ -7,15 +7,15 @@
 #    http://shiny.rstudio.com/
 #
   
-library(shiny)
-library(shinyjs)
-library(shinythemes)
-library(CrisisAfrica)
-library(tidyverse)
-library(corrplot)
-library(cowplot)
-library(MASS)
-library(knitr)
+  library(shiny)
+  library(shinyjs)
+  library(shinythemes)
+  library(CrisisAfrica)
+  library(tidyverse)
+  library(corrplot)
+  library(cowplot)
+  library(MASS)
+  library(knitr)
 
 data <- read.csv("data/african_crises.csv")
 # datac: les données nettoyées
