@@ -20,6 +20,11 @@
 data <- read.csv("data/african_crises.csv")
 # datac: les données nettoyées
 datac <- CleanData(data)
+
+# Conversion d'un fichier Rmarkdown en markdown
+rmdfiles <- c("projetb.Rmd")
+sapply(rmdfiles, knit, quiet = T)
+
 # Define UI for resume our project
 ui <- navbarPage(theme= shinytheme("readable"),
                  title = img(src="ugalogo.jpg", height = "40px",align="center"), id = "navBar",
@@ -40,9 +45,6 @@ ui <- navbarPage(theme= shinytheme("readable"),
                               verbatimTextOutput("sortie") 
                  ), 
                  tabPanel("Analyse et interpretation",
-                          # Conversion d'un fichier Rmarkdown en markdown
-                          rmdfiles <- c("projetb.Rmd"),
-                          sapply(rmdfiles, knit, quiet = T),
                           withMathJax(includeMarkdown("projetb.md"))
                             
                   ),
