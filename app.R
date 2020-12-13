@@ -16,8 +16,8 @@ library(corrplot)
 library(cowplot)
 library(MASS)
 data <- read.csv("data/african_crises.csv")
-data <- CleanData(data)
-
+# datac: les données nettoyées
+datac <- CleanData(data)
 # Define UI for resume our project
 ui <- navbarPage(theme= shinytheme("readable"),
                  title = img(src="ugalogo.jpg", height = "40px",align="center"), id = "navBar",
@@ -28,11 +28,12 @@ ui <- navbarPage(theme= shinytheme("readable"),
                             selectInput("sIV",label = "type de visualisation",choices = c("Visualisation1","Visualisation2",
                                                                                           "Visualisation3","Visualisation4"
                                                                                           ,"Visualisation5"
-                                                                                          ,"Visualisation6","Visualisation7"))
+                                                                                           ,"Visualisation6","Visualisation7"))
                           ),
                       
-                              verbatimTextOutput("summary"),
+                              
                               tableOutput("table"),
+                              verbatimTextOutput("summary"),
                               plotOutput("descriptive"),
                               verbatimTextOutput("sortie") 
                  ), 
@@ -58,25 +59,29 @@ ui <- navbarPage(theme= shinytheme("readable"),
 )
 
 server <- function(input, output,session) {
-    output$summary <- renderPrint({
+  output$table <- renderTable({
+    if(input$sI=="ReadData"){
+      r <- ReadData(data)
+      r[1]
+    }
+  })
+  output$summary <- renderPrint({
         if(input$sI =="CleanData"){
-            summary(CleanData(data))
+          summary(CleanData(data))
         }
-       else if(input$sI=="LoadData"){
-         if (exists("data")){
-           print("les données data ont été chargé avec succes")
+        else if(input$sI=="ReadData"){
+          r <- ReadData(data)
+          r[2]
+        }
+        else if(input$sI=="LoadData"){
+           if (exists("data")){
+             print("les données data ont été chargé avec succes")
+           }
          }
-       }
     })
-    output$table <- renderTable({
-        if(input$sI=="ReadData"){
-            ReadData(data)
-        }
-    })
-    
     output$descriptive <- renderPlot({
             if(input$sI == "Visualisation"){
-                  v <- Visualisation(data)
+                  v <- Visualisation(datac)
                   if(input$sIV=="Visualisation1"){
                     v[1]
                   }
@@ -100,18 +105,18 @@ server <- function(input, output,session) {
                   }
              }
         else if(input$sI == "RegressionLineaire"){
-          RegressionLineaire(data)
+          RegressionLineaire(datac)
         }
         else if(input$sI == "Correlation"){
-            Correlation(data)
+            Correlation(datac)
         }
     })
     output$sortie <- renderPrint({
       if(input$sI=="RegressionLineaire"){
-        RegressionLineaire(data)
+        RegressionLineaire(datac)
       }
       else if(input$sI=="Correlation"){
-        Correlation(data)
+        Correlation(datac)
       }
     })
     
